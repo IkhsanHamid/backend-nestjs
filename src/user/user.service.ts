@@ -12,8 +12,8 @@ import {
 import { PrismaService } from '../common/prisma.serivce';
 import { UserValidation } from './user.validation';
 import * as bcrypt from 'bcrypt';
-import { v4 as uuid } from 'uuid';
 import { User } from '@prisma/client';
+import { JwtService } from '@nestjs/jwt';
 
 @Injectable()
 export class UserService {
@@ -21,6 +21,7 @@ export class UserService {
     private validationService: ValidationService,
     @Inject(WINSTON_MODULE_PROVIDER) private logger: Logger,
     private prismaService: PrismaService,
+    private jwtService: JwtService,
   ) {}
 
   async register(request: RegisterUserRequest): Promise<UserResponse> {
@@ -84,13 +85,15 @@ export class UserService {
     if (!isPasswordValid) {
       throw new HttpException('Username or password is Invalid', 401);
     }
+    const token = await this.jwtService.signAsync(user);
+    console.log('ini token ======== ', token);
 
     user = await this.prismaService.user.update({
       where: {
         id: user.id,
       },
       data: {
-        token: uuid(),
+        token: token,
         isLogin: true,
       },
     });
@@ -151,5 +154,13 @@ export class UserService {
       },
     });
     return 'success logout';
+  }
+
+  async checkingRole(id: number): Promise<object> {
+    return await this.prismaService.roles.findUnique({
+      where: {
+        id: id,
+      },
+    });
   }
 }

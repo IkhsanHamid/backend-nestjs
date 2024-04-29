@@ -47,26 +47,26 @@ describe('UserController (e2e)', () => {
       const response = await request(app.getHttpServer())
         .post('/api/users/register')
         .send({
-          username: 'ikhsans',
+          username: 'test',
           password: '12345678',
-          name: 'ikhsans hamid',
+          name: 'test',
           roleId: 1,
         });
 
       logger.info(response.body);
 
       expect(response.status).toBe(201);
-      expect(response.body.data.username).toBe('ikhsans');
-      expect(response.body.data.name).toBe('ikhsans hamid');
+      expect(response.body.data.username).toBe('test');
+      expect(response.body.data.name).toBe('test');
     });
 
     it('should be rejected if username already exists', async () => {
       const response = await request(app.getHttpServer())
         .post('/api/users/register')
         .send({
-          username: 'ikhsan',
+          username: 'ikhsans',
           password: '12345678',
-          name: 'ikhsan hamid',
+          name: 'ikhsans hamid',
           roleId: 1,
         });
 
@@ -100,7 +100,7 @@ describe('UserController (e2e)', () => {
       const response = await request(app.getHttpServer())
         .post('/api/users/login')
         .send({
-          username: 'ikhsan',
+          username: 'ikhsans',
           password: '12345678',
         });
 
@@ -119,7 +119,7 @@ describe('UserController (e2e)', () => {
     it('should be rejected if token is invalid', async () => {
       const response = await request(app.getHttpServer())
         .get('/api/users/current')
-        .set('authorization', 'wrong');
+        .set('Authorization', 'wrong');
 
       logger.info(response.body);
 
@@ -130,7 +130,7 @@ describe('UserController (e2e)', () => {
     it('should be able to get user', async () => {
       const response = await request(app.getHttpServer())
         .get('/api/users/current')
-        .set('authorization', 'test');
+        .set('Authorization', `Bearer ${process.env.TOKEN}`);
 
       logger.info(response.body);
 
@@ -147,7 +147,7 @@ describe('UserController (e2e)', () => {
     it('should be rejected if request is invalid', async () => {
       const response = await request(app.getHttpServer())
         .put('/api/users/current')
-        .set('authorization', 'test')
+        .set('Authorization', `Bearer ${process.env.TOKEN}`)
         .send({
           password: '',
           name: '',
@@ -162,7 +162,7 @@ describe('UserController (e2e)', () => {
     it('should be able to update name', async () => {
       const response = await request(app.getHttpServer())
         .put('/api/users/current')
-        .set('authorization', 'test')
+        .set('Authorization', `Bearer ${process.env.TOKEN}`)
         .send({
           name: 'ikhsans updated',
         });
@@ -176,7 +176,7 @@ describe('UserController (e2e)', () => {
     it('should be able to update password', async () => {
       let response = await request(app.getHttpServer())
         .put('/api/users/current')
-        .set('authorization', 'test')
+        .set('Authorization', `Bearer ${process.env.TOKEN}`)
         .send({
           password: '123456789',
         });
@@ -208,7 +208,7 @@ describe('UserController (e2e)', () => {
     it('should be rejected if token is invalid', async () => {
       const response = await request(app.getHttpServer())
         .delete('/api/users/logout')
-        .set('authorization', 'wrong');
+        .set('Authorization', 'wrong');
 
       logger.info(response.body);
 
@@ -219,7 +219,7 @@ describe('UserController (e2e)', () => {
     it('should be able to logout user', async () => {
       const response = await request(app.getHttpServer())
         .delete('/api/users/logout')
-        .set('authorization', 'test');
+        .set('Authorization', `Bearer ${process.env.TOKEN}`);
 
       logger.info(response.body);
 
